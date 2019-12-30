@@ -1,5 +1,8 @@
 import {Component, OnInit} from '@angular/core';
 import * as firebase from 'firebase/app';
+import {Store} from '@ngrx/store';
+import * as AuthActions from './auth/store/auth.actions';
+import {AppState} from './store/app.reducers';
 
 @Component({
   selector: 'app-root',
@@ -7,13 +10,13 @@ import * as firebase from 'firebase/app';
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent implements OnInit {
-  loadedFeature = 'recipe';
 
-  onNavigate(feature: string) {
-    this.loadedFeature = feature;
+  constructor(private store: Store<AppState>) {
   }
 
   ngOnInit(): void {
+    this.store.dispatch(AuthActions.autoLogin());
+
     const firebaseConfig = {
       apiKey: 'AIzaSyAwmHZBX6aU_l1AJdByEGuKSZdrJULn_F0',
       authDomain: 'ng-recipe-book-a334f.firebaseapp.com',

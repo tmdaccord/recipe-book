@@ -1,45 +1,57 @@
 import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
+import {HttpClient, HttpParams} from '@angular/common/http';
 import {RecipeService} from '../recipes/recipe.service';
-import {map} from 'rxjs/operators';
+import {exhaustMap, map, take, tap} from 'rxjs/operators';
 import {Recipe} from '../recipes/recipe.model';
+import {AuthService} from '../auth/auth.service';
 
 @Injectable()
 export class DataStorageService {
 
-  constructor(private httpClient: HttpClient, private recipeService: RecipeService) {
+  constructor(private httpClient: HttpClient, private recipeService: RecipeService, private authService: AuthService) {
   }
 
   storeRecipes() {
     // const token = this.authService.getToken();
-    return this.httpClient.put('https://ng-recipe-book-a334f.firebaseio.com/recipes.json',
+    this.httpClient.put('https://ng-recipe-book-a334f.firebaseio.com/recipes.json',
       this.recipeService.getRecipes()
       // {params: new HttpParams().set('auth', token)}
-      );
+    ).subscribe(
+      (response) => {
+        console.log(response);
+      },
+      (error) => {
+        console.log(error);
+      }
+    );
   }
 
-  getRecipes() {
+  fetchRecipes() {
     // const token = this.authService.getToken();
-
-    return this.httpClient.get<Recipe[]>('https://ng-recipe-book-a334f.firebaseio.com/recipes.json'
-      // {params: new HttpParams().set('auth', token)}
-      )
-      .pipe(map((recipes) => {
-        for (const recipe of recipes) {
-          if (!recipe.ingredients) {
-            console.log(recipe);
-            recipe.ingredients = [];
-          }
-        }
-        return recipes;
-      }))
-      .subscribe(
-        (recipes: Recipe[]) => {
-          this.recipeService.setRecipes(recipes);
-        },
-        (error) => {
-          console.log(error);
-        }
-      );
+    return this.httpClient.get<Recipe[]>('https://ng-recipe-book-a334f.firebaseio.com/recipes.json').pipe(
+      map(recipes => {
+        return recipes.map(recipe => {
+          return {
+            ...recipe,
+            ingredients: recipe.ingredients ? recipe.ingredients : []
+          };
+        });
+      }),
+      tap(recipes => {
+        this.recipeService.setRecipes(recipes);
+      })
+    );
+    // return this.httpClient.get<Recipe[]>('https://ng-recipe-book-a334f.firebaseio.com/recipes.json'
+    //   // {params: new HttpParams().set('auth', token)}
+    // )
+    //   .pipe()
+    //   .subscribe(
+    //     (recipes: Recipe[]) => {
+    //       this.recipeService.setRecipes(recipes);
+    //     },
+    //     (error) => {
+    //       console.log(error);
+    //     }
+    //   );
   }
 }

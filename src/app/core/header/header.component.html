@@ -7,12 +7,11 @@
       </li>
     </ul>
     <ul class="nav navbar-nav float-right">
-      <ng-template [ngIf]="!isAuthenticated()">
-        <li><a routerLink="/signup">Register</a></li>
-        <li><a routerLink="/signin">Login</a></li>
+      <ng-template [ngIf]="!isAuthenticated">
+        <li><a routerLink="/auth">Authenticate</a></li>
       </ng-template>
 
-      <ng-template [ngIf]="isAuthenticated()">
+      <ng-template [ngIf]="isAuthenticated">
         <li><a (click)="onLogout()">Logout</a></li>
         <li class="dropdown" appDropdown>
           <a class="dropdown-toggle" role="button">Manage</a>

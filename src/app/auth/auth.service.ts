@@ -1,57 +1,34 @@
 import {Injectable} from '@angular/core';
-import {Router} from '@angular/router';
-import * as firebase from 'firebase/app';
-import 'firebase/auth';
+import {Store} from '@ngrx/store';
+import {AppState} from '../store/app.reducers';
+import * as AuthActions from '../auth/store/auth.actions';
+
+export interface AuthResponseData {
+  idToken: string;
+  email: string;
+  refreshToken: string;
+  expiresIn: string;
+  localId: string;
+  registered?: boolean;
+}
 
 @Injectable()
 export class AuthService {
-  token: string;
+  private tokenExpirationTimer;
 
-  constructor(private  router: Router) {
+  constructor(private store: Store<AppState>) {
   }
 
-  signupUser(email: string, password: string) {
-    firebase.auth().createUserWithEmailAndPassword(email, password)
-      .catch(
-        error => {
-          console.log(error);
-        }
-      );
+  setLogoutTimer(expirationDuration: number) {
+    this.tokenExpirationTimer = setTimeout(() => {
+      this.store.dispatch(AuthActions.logout());
+    }, expirationDuration);
   }
 
-  signinUser(email: string, password: string) {
-    firebase.auth().signInWithEmailAndPassword(email, password)
-      .then(
-        response => {
-          this.router.navigate(['/']);
-          firebase.auth().currentUser.getIdToken().then(
-            (token: string) => {
-              this.token = token;
-            }
-          );
-          console.log(response);
-        }
-      )
-      .catch(
-        error => {
-          console.log(error);
-        }
-      );
-  }
-
-  signout() {
-    firebase.auth().signOut();
-    this.token = null;
-  }
-
-  getToken() {
-    firebase.auth().currentUser.getIdToken().then((token: string) => {
-      this.token = token;
-    });
-    return this.token;
-  }
-
-  isAuthenticated() {
-    return this.token != null;
+  clearLogoutTimer() {
+    if (this.tokenExpirationTimer) {
+      clearTimeout(this.tokenExpirationTimer);
+      this.tokenExpirationTimer = null;
+    }
   }
 }

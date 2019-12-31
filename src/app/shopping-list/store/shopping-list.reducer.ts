@@ -38,8 +38,6 @@ const shoppingListReducer = createReducer(
     };
   }),
   on(ShoppingListActions.deleteIngredient, (state) => {
-    // const newIngredients = [...state.ingredients];
-    // newIngredients.splice(state.editedIngredientIndex, 1);
     return {
       ...state,
       ingredients: state.ingredients.filter((ig, igIndex) => {

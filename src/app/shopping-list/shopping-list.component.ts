@@ -2,7 +2,7 @@ import {Component, OnInit} from '@angular/core';
 import {Ingredient} from '../shared/ingredient.model';
 import {Observable} from 'rxjs';
 import {Store} from '@ngrx/store';
-import {startEdit} from './store/shopping-list.actions';
+import * as ShoppingListActions from './store/shopping-list.actions';
 import {AppState} from '../store/app.reducers';
 
 @Component({
@@ -21,6 +21,6 @@ export class ShoppingListComponent implements OnInit {
     }
 
     onEditItem(index: number) {
-        this.store.dispatch(startEdit({index}));
+        this.store.dispatch(ShoppingListActions.startEdit({index}));
     }
 }

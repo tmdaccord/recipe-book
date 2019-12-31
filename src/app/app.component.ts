@@ -1,9 +1,8 @@
-import {Component, Inject, OnInit, PLATFORM_ID} from '@angular/core';
+import {Component, OnInit} from '@angular/core';
 import * as firebase from 'firebase/app';
 import {Store} from '@ngrx/store';
 import * as AuthActions from './auth/store/auth.actions';
 import {AppState} from './store/app.reducers';
-import {isPlatformBrowser} from '@angular/common';
 
 @Component({
   selector: 'app-root',
@@ -12,13 +11,11 @@ import {isPlatformBrowser} from '@angular/common';
 })
 export class AppComponent implements OnInit {
 
-  constructor(private store: Store<AppState>, @Inject(PLATFORM_ID) private platformId) {
+  constructor(private store: Store<AppState>) {
   }
 
   ngOnInit(): void {
-    if (isPlatformBrowser(this.platformId)) {
-      this.store.dispatch(AuthActions.autoLogin());
-    }
+    this.store.dispatch(AuthActions.autoLogin());
 
     const firebaseConfig = {
       apiKey: 'AIzaSyAwmHZBX6aU_l1AJdByEGuKSZdrJULn_F0',
